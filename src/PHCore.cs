@@ -1,19 +1,40 @@
-using System;
 using System.Reflection;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-using DuckGame;
+using System;
 
 namespace DuckGame.PropHunt
 {
     public class PHCore : Thing, IEngineUpdatable
     {
         private Level _prevLevel;
-        private PHGameMode _gamemode;
+        private PHGameModeHandler _gmHandler;
+        private PHData _data;
         private bool _isPHLevel;
 
-        public bool IsPHLevel { get => _isPHLevel;}
-        public PHGameMode Gamemode { get => _gamemode; }
+        public bool IsPHLevel
+        {
+            get
+            {
+                return _isPHLevel;
+            }
+        }
+
+        public PHGameModeHandler GMHandler
+        {
+            get
+            {
+                return _gmHandler;
+            }
+        }
+
+        public PHData Data 
+        { 
+            get
+            {
+                return _data;
+            }
+        }
 
         public PHCore()
         {
@@ -30,40 +51,49 @@ namespace DuckGame.PropHunt
         {
             DevConsole.Log("[PH] Level changed to " + level.level);
             DestroyPreviousGM();
-            PHMode phMode = GetLevelPHMode(level);
-            if (phMode != null)
+            if (Level.current is GameLevel || Level.current is DuckGameTestArea)
             {
-                DevConsole.Log("[PH] Current level is a PH level");
-                _isPHLevel = true;
-                CreateNewGM(phMode);
-            }
-            else
-            {
-                DevConsole.Log("[PH] Current level is NOT a PH level");
-                _isPHLevel = false;
+                PHMode phMode = GetLevelPHMode(level);
+                if (phMode != null)
+                {
+                    DevConsole.Log("[PH] Current level is a PH level");
+                    CreateNewGM(phMode);
+                }
+                else
+                {
+                    DevConsole.Log("[PH] Current level is NOT a PH level");
+                }
             }
         }
 
         private void CreateNewGM(PHMode phMode)
         {
-            _gamemode = new PHGameMode(phMode);
-            Level.current.AddThing(_gamemode);
+            _isPHLevel = true;
+            _data = new PHData();
+            if (Network.isServer)
+            {
+                DevConsole.Log("[PH] Im server");
+                _gmHandler = new PHGameModeHandler(phMode);
+                Level.current.AddThing(_gmHandler);
+            }
         }
 
         private void DestroyPreviousGM()
         {
-            if (_gamemode != null)
+            _isPHLevel = false;
+            _data = null;
+            if (_gmHandler != null)
             {
-                _gamemode.active = false;
-                _gamemode = null;
+                _gmHandler.active = false;
+                _gmHandler = null;
             }
         }
 
         public PHMode GetLevelPHMode(Level level)
         {
-            foreach (Thing t in level.things)
+            foreach (PHMode t in level.things[typeof(PHMode)])
             {
-                if (t is PHMode mode) return mode;
+                return t;
             }
             return null;
         }
@@ -78,11 +108,15 @@ namespace DuckGame.PropHunt
             if (Level.current != _prevLevel && Level.current.things.Count > 0)
             {
                 // Level exists ( Duck in level )
-                if (Level.current is GameLevel || Level.current is DuckGameTestArea)
+                if (Level.current is XMLLevel || Level.current is DuckGameEditor || Level.current is TeamSelect2)
                 {
                     _prevLevel = Level.current;
                     InvokeLevelChanged(Level.current);
                 }
+            }
+            if(Data != null)
+            {
+                Data.Update();
             }
         }
 

@@ -7,7 +7,7 @@
     <ProjectGuid>{B07BDC3C-3770-4A07-90D8-5C2A68E2172B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PropHunt</RootNamespace>
+    <RootNamespace>DuckGame.PropHunt</RootNamespace>
     <AssemblyName>PropHunt</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -34,9 +34,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DuckGame">
-      <HintPath>/home/guskikalola/.local/share/Steam/steamapps/common/Duck Game/DuckGame.exe</HintPath>
-      <Private>False</Private>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Duck Game\DuckGame.exe</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Xna.Framework.Game, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -46,7 +46,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="src\*.cs" />
+    <Compile Include="src\PHData.cs" />
+    <Compile Include="src\netmessages\NMDataUpdate.cs" />
+    <Compile Include="src\PHCore.cs" />
+    <Compile Include="src\PHDraw.cs" />
+    <Compile Include="src\PHGameMode.cs" />
+    <Compile Include="src\PHHiderTool.cs" />
+    <Compile Include="src\PHHunterTool.cs" />
+    <Compile Include="src\PHMode.cs" />
+    <Compile Include="src\PHModeConfig.cs" />
+    <Compile Include="src\spawns\PHHunterSpawn.cs" />
+    <Compile Include="src\spawns\PHHiderSpawn.cs" />
+    <Compile Include="src\spawns\PHSpawn.cs" />
+    <Compile Include="src\PHTool.cs" />
+    <Compile Include="src\PropHunt.cs" />
+    <Compile Include="src\tools\PHHiderTool.cs" />
+    <Compile Include="src\tools\PHHunterTool.cs" />
+    <Compile Include="src\tools\PHTool.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

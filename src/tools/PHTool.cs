@@ -3,10 +3,9 @@ using System.Collections.Generic;
 
 namespace DuckGame.PropHunt
 {
-    [EditorGroup("PropHunt")]
-    [BaggedProperty("isOnlineCapable", true)]
-    public class PHTool : Equipment
+    public abstract class PHTool : Equipment
     {
+        public StateBinding _fireTimerBinding = new StateBinding("_fireTimer");
         private Sprite _sprite;
         private bool _fired;
         protected float _fireTimer = 0f;
@@ -66,23 +65,33 @@ namespace DuckGame.PropHunt
         {
             if (PropHunt.core.IsPHLevel)
             {
-                List<Duck> teamMates = null;
-                if (this is PHHiderTool)
-                {
-                    teamMates = PropHunt.core.Gamemode.Hiders;
-                }
-                else if (this is PHHunterTool)
-                {
-                    teamMates = PropHunt.core.Gamemode.Hunters;
-                }
+                List<Duck> teamMates = new List<Duck>();
 
-                if (teamMates != null)
+                List<Team> teams = Teams.active;
+                foreach (Team team in teams)
                 {
-                    foreach (Duck d in teamMates)
+                    List<Profile> profiles = team.activeProfiles;
+                    foreach (Profile profile in profiles)
                     {
-                        DrawTeamMates(teamMates);
+                        Duck d = profile.duck;
+                        if (this is PHHiderTool)
+                        {
+                            if (d.GetEquipment(typeof(PHHiderTool)) != null)
+                            {
+                                teamMates.Add(d);
+                            }
+                        }
+                        else if (this is PHHunterTool)
+                        {
+                            if (d.GetEquipment(typeof(PHHunterTool)) != null)
+                            {
+                                teamMates.Add(d);
+                            }
+                        }
                     }
                 }
+
+                DrawTeamMates(teamMates);
             }
         }
 

@@ -57,11 +57,11 @@ namespace DuckGame.PropHunt
         {
             if (PropHunt.core.IsPHLevel)
             {
-                PHGameMode gamemode = PropHunt.core.Gamemode;
+                PHData data = PropHunt.core.Data;
 
                 string gameStatus;
-                double remainingTime = Math.Round(gamemode.RemainingTime);
-                switch (gamemode.Status)
+                double remainingTime = Math.Round(data.RemainingTime);
+                switch (data.Status)
                 {
                     case PHGameStatus.CREATED:
                         gameStatus = "CREATED";
@@ -72,6 +72,9 @@ namespace DuckGame.PropHunt
                     case PHGameStatus.HUNTING:
                         gameStatus = "HUNTING";
                         break;
+                    case PHGameStatus.ENDED:
+                        gameStatus = "ENDED";
+                        break;
                     default:
                         gameStatus = "?";
                         break;
@@ -80,11 +83,37 @@ namespace DuckGame.PropHunt
 
                 Graphics.screen.Begin(SpriteSortMode.BackToFront, BlendState.NonPremultiplied, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Resolution.getTransformationMatrix());
 
-                string tStatus = "Status: " + gameStatus;
-                string tTime = "Remaining time: " + remainingTime;
-                Graphics.DrawString(tStatus, new Vec2(CalculateScreenXCenter(tStatus), 50), Color.Coral);
-                Graphics.DrawString(tTime, new Vec2(CalculateScreenXCenter(tTime), 50 + 10), Color.Coral);
+                if (data.Status != PHGameStatus.ENDED)
+                {
+                    string tStatus = "Status: " + gameStatus;
+                    string tTime = "Remaining time: " + remainingTime;
+                    Graphics.DrawString(tStatus, new Vec2(CalculateScreenXCenter(tStatus), 50), Color.Coral);
+                    Graphics.DrawString(tTime, new Vec2(CalculateScreenXCenter(tTime), 50 + 10), Color.Coral);
+                }
 
+                if (PropHunt.core.Data.Status == PHGameStatus.ENDED)
+                {
+                    string winner;
+                    Color color;
+                    switch (PropHunt.core.Data.winner)
+                    {
+                        case 0: // Hunters
+                            winner = "HUNTERS";
+                            color = Color.Red;
+                            break;
+                        case 1: // Hiders
+                            winner = "HIDERS";
+                            color = Color.Blue;
+                            break;
+                        default:
+                            winner = "?";
+                            color = Color.SaddleBrown;
+                            break;
+                    }
+                    winner += " WIN!";
+                    Graphics.DrawFancyString(winner, new Vec2(CalculateScreenXCenter(winner), 70),color);
+
+                }
                 Graphics.screen.End();
             }
 

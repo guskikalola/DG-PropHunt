@@ -5,12 +5,11 @@ using DuckGame;
 
 namespace DuckGame.PropHunt
 {
-    [EditorGroup("PropHunt", EditorItemType.Custom)]
-    [BaggedProperty("isOnlineCapable", true)]
+    [EditorGroup("PropHunt")]
     public class PHMode : Thing
     {
-        public EditorProperty<int> hidingTime = new EditorProperty<int>(val:15, min:5);
-        public EditorProperty<int> huntingTime = new EditorProperty<int>(val:30, min:10);
+        public EditorProperty<int> hidingTime = new EditorProperty<int>(val:15, min:5, max:45);
+        public EditorProperty<int> huntingTime = new EditorProperty<int>(val:30, min:10,max:240);
         public EditorProperty<int> huntersAmount = new EditorProperty<int>(val:1, min:1, max:8);
         private PHModeConfig _config;
         public PHMode()

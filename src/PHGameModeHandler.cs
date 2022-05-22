@@ -10,26 +10,54 @@ namespace DuckGame.PropHunt
         HUNTING,
         ENDED
     }
-    public class PHGameMode : Thing
+    public class PHGameModeHandler : Thing
     {
         private readonly PHModeConfig _config;
         private float _hidingTimer;
         private float _huntingTimer;
         private PHGameStatus _status = PHGameStatus.CREATED;
-        private List<Duck> _hunters;
-        private List<Duck> _hiders;
-        private bool _gmInitialized = false;
+        private List<Duck> _hunters = new List<Duck>();
+        private List<Duck> _hiders = new List<Duck>();
 
-        public List<Duck> Hunters { get => _hunters; }
-        public List<Duck> Hiders { get => _hiders; }
-        public PHGameStatus Status { get => _status; }
+        public List<Duck> Hunters
+        {
+            get
+            {
+                return _hunters;
+            }
+        }
+        public List<Duck> Hiders
+        {
+            get
+            {
+                return _hiders;
+            }
+        }
+        public PHGameStatus Status
+        {
+            get
+            {
+                return _status;
+            }
+            set
+            {
+                _status = value;
+                float remainingTime;
+                if (Status == PHGameStatus.HIDING) remainingTime = _config.HidingTime;
+                else if (Status == PHGameStatus.HUNTING) remainingTime = _config.HuntingTime;
+                else remainingTime = 0f;
+
+                Send.Message((NetMessage) new NMChangeStatus(Status, remainingTime));
+                PropHunt.core.Data.ChangeStatus(Status, remainingTime);
+            }
+        }
 
         public float RemainingTime
         {
             get
             {
-                if (_status == PHGameStatus.HIDING) return _hidingTimer;
-                else if (_status == PHGameStatus.HUNTING) return _huntingTimer;
+                if (Status == PHGameStatus.HIDING) return _hidingTimer;
+                else if (Status == PHGameStatus.HUNTING) return _huntingTimer;
                 else return 0f;
             }
         }
@@ -60,7 +88,7 @@ namespace DuckGame.PropHunt
             }
         }
 
-        public PHGameMode(PHMode phMode) : base()
+        public PHGameModeHandler(PHMode phMode) : base()
         {
             _config = phMode.PHConfig;
             _hidingTimer = _config.HidingTime;
@@ -68,8 +96,6 @@ namespace DuckGame.PropHunt
 
         public void SelectHunters(int amount)
         {
-            _hunters = new List<Duck>();
-            _hiders = new List<Duck>();
             List<Team> teams = Teams.allRandomized;
             foreach (Team team in teams)
             {
@@ -83,11 +109,14 @@ namespace DuckGame.PropHunt
             }
 
         }
-
+        public override void Initialize()
+        {
+            base.Initialize();
+            InitializeGM();
+        }
         private void InitializeGM()
         {
             DevConsole.Log("[PH] Configuration " + _config.ToString());
-            _gmInitialized = true;
             DevConsole.Log("[PH] Initializing...");
             SelectHunters(_config.HuntersAmount);
             InvokeStartHiding();
@@ -113,14 +142,14 @@ namespace DuckGame.PropHunt
         {
             GiveWeapons();
             MakeHuntersInvincibleAndFreeze();
-            _status = PHGameStatus.HIDING;
+            Status = PHGameStatus.HIDING;
             _hidingTimer = _config.HidingTime;
             DevConsole.Log("[PH] Hiding...");
         }
 
         private void OnStartHunting()
         {
-            _status = PHGameStatus.HUNTING;
+            Status = PHGameStatus.HUNTING;
             MakeHuntersMortalAndUnFreeze();
             _huntingTimer = _config.HidingTime;
             DevConsole.Log("[PH] Hunting...");
@@ -128,10 +157,39 @@ namespace DuckGame.PropHunt
 
         private void OnRoundEnded()
         {
-            _status = PHGameStatus.ENDED;
+            if (Status == PHGameStatus.ENDED) return;
+            Status = PHGameStatus.ENDED;
             int huntersAlive = HuntersAlive;
             int hidersAlive = HidersAlive;
             DevConsole.Log(String.Format("[PH] Round ended. Hiders {0} | Hunters {1}", hidersAlive, huntersAlive));
+            if(HidersAlive == 0)
+            {
+                // Hunters WIN
+                PropHunt.core.Data.winner = 0;
+                Send.Message((NetMessage)new NMRoundEnded(0));
+            }
+            else if(HuntersAlive == 0 || RemainingTime <= 0f)
+            {
+                // Hiders WIN
+                PropHunt.core.Data.winner = 1;
+                Send.Message((NetMessage)new NMRoundEnded(1));
+            }
+
+            List<Team> teams = Teams.allRandomized;
+            foreach (Team team in teams)
+            {
+                List<Profile> profiles = team.activeProfiles;
+                foreach (Profile profile in profiles)
+                {
+                    Duck d = profile.duck;
+                    if(d != null && !d.dead)
+                    {
+                        EnergyScimitar weapon = new EnergyScimitar(d.position.x, d.position.y);
+                        Level.Add(weapon);
+                        d.GiveHoldable(weapon);
+                    }
+                }
+            }
         }
 
         private void MakeHuntersInvincibleAndFreeze()
@@ -140,6 +198,7 @@ namespace DuckGame.PropHunt
             {
                 hunter.moveLock = true;
                 hunter.invincible = true;
+                Send.Message((NetMessage)new NMMakeHuntersInvincibleAndFreeze(hunter));
             }
         }
 
@@ -149,6 +208,7 @@ namespace DuckGame.PropHunt
             {
                 hunter.moveLock = false;
                 hunter.invincible = false;
+                Send.Message((NetMessage)new NMMakeHuntersMortalAndUnFreeze(hunter));
             }
         }
 
@@ -165,6 +225,14 @@ namespace DuckGame.PropHunt
                 PHHunterTool tool = new PHHunterTool(hunter.position.x, hunter.position.y);
                 Level.Add(tool);
                 hunter.Equip(tool);
+            }
+        }
+
+        public void UpdateAliveDucks()
+        {
+            if (HuntersAlive == 0 || HidersAlive == 0)
+            {
+                InvokeRoundEnded();
             }
         }
 
@@ -189,11 +257,13 @@ namespace DuckGame.PropHunt
         public override void Update()
         {
             base.Update();
-            switch (_status)
+            if(!DuckNetwork.allClientsReady) 
             {
-                case PHGameStatus.CREATED:
-                    if (!_gmInitialized) InitializeGM();
-                    break;
+                DevConsole.Log("[PH] Not ready");
+                return;
+            }
+            switch (Status)
+            {
                 case PHGameStatus.HIDING:
                     if (_hidingTimer > 0f)
                     {
@@ -215,6 +285,7 @@ namespace DuckGame.PropHunt
                     }
                     break;
             }
+            UpdateAliveDucks();
         }
 
         public override void Draw()

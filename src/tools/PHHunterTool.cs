@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 namespace DuckGame.PropHunt
 {
-    [EditorGroup("PropHunt")]
-    [BaggedProperty("isOnlineCapable", true)]
+    [EditorGroup("PropHunt|tools")]
     public class PHHunterTool : PHTool
     {
+        float checkRadius = 5f;
         public PHHunterTool(float xval, float yval) : base(xval, yval)
         {
             fireCooldown = 6f;
@@ -16,7 +16,7 @@ namespace DuckGame.PropHunt
         {
             if (PropHunt.core.IsPHLevel)
             {
-                if (PropHunt.core.Gamemode.Status != PHGameStatus.HUNTING)
+                if (PropHunt.core.Data.Status != PHGameStatus.HUNTING)
                 {
                     return;
                 }
@@ -25,11 +25,21 @@ namespace DuckGame.PropHunt
             if (_fireTimer <= 0f)
             {
                 _fireTimer = fireCooldown;
+                KillNearbyHiders();
+            }
+        }
+
+        private void KillNearbyHiders()
+        {
+            Duck d = Level.CheckCircle<Duck>(equippedDuck.position.x,equippedDuck.position.y,checkRadius,equippedDuck);
+            if(d != null && d.GetEquipment(typeof(PHHiderTool)) != null)
+            {
                 if (Network.isActive)
                 {
                     Send.Message(new NMPop(duck.position));
                 }
                 NMPop.AmazingDisappearingParticles(duck.position);
+                d.Kill(new DTIncinerate(this));
             }
         }
 

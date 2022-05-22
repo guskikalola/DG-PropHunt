@@ -13,10 +13,39 @@ namespace DuckGame.PropHunt
 
         }
 
-        public float HidingTime { get => _hidingTime; set => _hidingTime = value; }
-        public int HuntersAmount { get => _huntersAmount; set => _huntersAmount = value; }
-        public float HuntingTime { get => _huntingTime; set => _huntingTime = value; }
-
+        public float HidingTime
+        {
+            get 
+            { 
+                return _hidingTime; 
+            }
+            set
+            {
+                _hidingTime = value;
+            }
+        }
+        public int HuntersAmount
+        {
+            get 
+            { 
+                return _huntersAmount; 
+            }
+            set
+            {
+                _huntersAmount = value;
+            }
+        }
+        public float HuntingTime
+        {
+            get
+            {
+                return _huntingTime;
+            }
+            set
+            {
+                _huntingTime = value;
+            }
+        }
         public override string ToString()
         {
             return String.Format("HidingTime: {0} | HuntingTime: {1} | HuntersAmount: {2}", HidingTime, HuntingTime, HuntersAmount);

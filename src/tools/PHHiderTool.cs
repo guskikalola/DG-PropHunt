@@ -3,8 +3,7 @@ using System.Collections.Generic;
 
 namespace DuckGame.PropHunt
 {
-    [EditorGroup("PropHunt")]
-    [BaggedProperty("isOnlineCapable", true)]
+    [EditorGroup("PropHunt|tool")]
     public class PHHiderTool : PHTool
     {
         public float _checkRadius = 7f;
@@ -17,7 +16,6 @@ namespace DuckGame.PropHunt
 
         public override void Fire()
         {
-            DevConsole.Log("Fired");
             if (_attachedProp != null) UnDisguise();
             else if(_fireTimer <= 0f)
             {
