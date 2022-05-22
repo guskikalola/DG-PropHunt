@@ -111,7 +111,7 @@ namespace DuckGame.PropHunt
                             break;
                     }
                     winner += " WIN!";
-                    Graphics.DrawFancyString(winner, new Vec2(CalculateScreenXCenter(winner), 70),color);
+                    Graphics.DrawFancyString(winner, new Vec2(CalculateScreenXCenter(winner), 70),color,scale:2f);
 
                 }
                 Graphics.screen.End();

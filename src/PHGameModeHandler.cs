@@ -186,7 +186,6 @@ namespace DuckGame.PropHunt
                     {
                         EnergyScimitar weapon = new EnergyScimitar(d.position.x, d.position.y);
                         Level.Add(weapon);
-                        d.GiveHoldable(weapon);
                     }
                 }
             }

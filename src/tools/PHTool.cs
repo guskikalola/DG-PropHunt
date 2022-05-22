@@ -48,6 +48,7 @@ namespace DuckGame.PropHunt
                 }
                 if (!fire && _fired) _fired = false;
             }
+            ReduceVision();
         }
 
         public virtual void Fire()
@@ -97,6 +98,16 @@ namespace DuckGame.PropHunt
 
         public virtual void DrawTeamMates(List<Duck> teamMates)
         {
+        }
+
+        public virtual void ReduceVision()
+        {
+            if (Level.current.camera != null && DuckNetwork.localProfile.duck.Equals(equippedDuck))
+            {
+                Vec2 cameraPos = equippedDuck.cameraPosition + equippedDuck.collisionOffset*2 - new Vec2(45f, 0);
+                Level.current.camera.position = cameraPos;
+                Level.current.camera.size = new Vec2(100f, 100f * DuckGame.Graphics.aspect);
+            }
         }
 
         public override void Draw()
