@@ -72,7 +72,6 @@ namespace DuckGame.PropHunt
             _data = new PHData();
             if (Network.isServer)
             {
-                DevConsole.Log("[PH] Im server");
                 _gmHandler = new PHGameModeHandler(phMode);
                 Level.current.AddThing(_gmHandler);
             }

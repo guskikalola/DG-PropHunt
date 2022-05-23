@@ -57,9 +57,6 @@
     <Compile Include="src\PHGameModeHandler.cs" />
     <Compile Include="src\PHMode.cs" />
     <Compile Include="src\PHModeConfig.cs" />
-    <Compile Include="src\spawns\PHHunterSpawn.cs" />
-    <Compile Include="src\spawns\PHHiderSpawn.cs" />
-    <Compile Include="src\spawns\PHSpawn.cs" />
     <Compile Include="src\PropHunt.cs" />
     <Compile Include="src\tools\PHHiderTool.cs" />
     <Compile Include="src\tools\PHHunterTool.cs" />

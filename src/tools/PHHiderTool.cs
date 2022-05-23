@@ -9,13 +9,24 @@ namespace DuckGame.PropHunt
         public float _checkRadius = 7f;
         private Holdable _attachedProp;
 
+        public Vec2 PropPosition
+        {
+            get
+            {
+                //  + equippedDuck.collisionSize.y - _attachedProp.collisionSize.y +_attachedProp.collisionOffset.y
+                return new Vec2(equippedDuck.position.x, (equippedDuck.position.y - equippedDuck.collisionOffset.y));
+            }
+        }
+
         public PHHiderTool(float xval, float yval) : base(xval, yval)
         {
-
+            _sprite.color = Color.Blue;
+            _teamMarker.color = Color.LightBlue;
         }
 
         public override void Fire()
         {
+            base.Fire();
             // Only work when you have you hand empty
             if (equippedDuck.holdObject != null) return;
             // If you are already disguised, undisguise.
@@ -26,12 +37,7 @@ namespace DuckGame.PropHunt
                 if (t != null)
                 {
                     _fireTimer = fireCooldown; // Starts the cooldown timer
-                    // Particles :D
-                    if (Network.isActive)
-                    {
-                        Send.Message(new NMPop(duck.position));
-                    }
-                    NMPop.AmazingDisappearingParticles(duck.position);
+                    _sprite.SetAnimation("active");
 
                     DisguiseAsProp(t);
                 }
@@ -56,6 +62,7 @@ namespace DuckGame.PropHunt
             equippedDuck.Fondle(_attachedProp);
             if (_attachedProp.equippedDuck != null) _attachedProp.equippedDuck.Disarm(this.equippedDuck);
             _attachedProp.canPickUp = false;
+            _attachedProp.solid = false;
             _attachedProp.enablePhysics = false;
         }
 
@@ -64,10 +71,11 @@ namespace DuckGame.PropHunt
             equippedDuck.visible = true;
             if (_attachedProp != null)
             {
+                equippedDuck.Fondle(_attachedProp);
                 _attachedProp.canPickUp = true;
                 _attachedProp.enablePhysics = true;
                 _attachedProp.ApplyForce(new Vec2(0, -1f));
-                equippedDuck.Fondle(_attachedProp);
+                _attachedProp.solid = true;
                 if (_attachedProp.equippedDuck != null) _attachedProp.equippedDuck.Disarm(this.equippedDuck);
             }
             _attachedProp = null;
@@ -77,28 +85,43 @@ namespace DuckGame.PropHunt
         {
             foreach (Duck d in teamMates)
             {
-                Vec2 circlePosition;
+                Vec2 pos;
                 Equipment eq = d.GetEquipment(GetType());
                 PHHiderTool tool = (PHHiderTool)eq;
-                circlePosition = tool._attachedProp == null ? d.position : tool._attachedProp.position;
-                Graphics.DrawCircle(circlePosition, 6f, Color.Blue);
+                pos = tool._attachedProp == null ? d.position : tool._attachedProp.position;
+                Graphics.Draw(_teamMarker, pos.x, pos.y - 10f);
             }
         }
 
         public override void Update()
         {
             base.Update();
-            if (_attachedProp != null && equippedDuck != null)
-            {
-                if (_attachedProp.destroyed) UnDisguise();
-                else
-                {
-                    if (equippedDuck.visible) equippedDuck.visible = false;
-                    _attachedProp.position.x = equippedDuck.position.x;
-                    _attachedProp.position.y = equippedDuck.position.y + _attachedProp.height * 0.5f;
-                }
-            }
 
+            if (equippedDuck != null)
+            {
+                // Use the RSTICK or LSTICK to open the taunt menu
+                if (!equippedDuck.dead && (equippedDuck.inputProfile.Pressed("RSTICK") || equippedDuck.inputProfile.Pressed("LSTICK")))
+                {
+                    // Only open for local duck
+                    if (equippedDuck.profile.Equals(DuckNetwork.localProfile)) OpenTauntMenu();
+                }
+
+                if (_attachedProp != null)
+                {
+                    if (_attachedProp.destroyed) UnDisguise();
+                    else
+                    {
+                        if (equippedDuck.visible) equippedDuck.visible = false;
+                        _attachedProp.position = PropPosition;
+                    }
+                }
+
+            }
+        }
+
+        private void OpenTauntMenu()
+        {
+            DevConsole.Log("[PH] Opening taunt menu");
         }
 
         public override void Thrown()

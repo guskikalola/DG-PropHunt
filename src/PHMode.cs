@@ -8,10 +8,9 @@ namespace DuckGame.PropHunt
     [EditorGroup("PropHunt")]
     public class PHMode : Thing
     {
-        public EditorProperty<int> hidingTime = new EditorProperty<int>(val:15, min:5, max:45);
-        public EditorProperty<int> huntingTime = new EditorProperty<int>(val:30, min:10,max:240);
-        public EditorProperty<int> huntersAmount = new EditorProperty<int>(val:1, min:1, max:8);
-        private PHModeConfig _config;
+        public EditorProperty<int> hidingTime = new EditorProperty<int>(val: 15, min: 15, max: 60);
+        public EditorProperty<int> huntingTime = new EditorProperty<int>(val: 120, min: 45, max: 620);
+        public EditorProperty<int> huntersAmount = new EditorProperty<int>(val: 1, min: 1, max: 8);
         public PHMode()
         {
             graphic = new Sprite("challengeIcon");
@@ -24,31 +23,6 @@ namespace DuckGame.PropHunt
             _canFlip = false;
             _canHaveChance = false;
 
-            _config = new PHModeConfig();
-
-        }
-
-        public PHModeConfig PHConfig 
-        {
-            get
-            {
-                return _config;
-            }
-        }
-
-        public override void EditorPropertyChanged(object property)
-        {
-            base.EditorPropertyChanged(property);
-            if(hidingTime.Equals(property))
-            {
-                // update hiding time
-                _config.HidingTime = hidingTime.value;
-            }
-            else if(huntersAmount.Equals(property))
-            {
-                // update the hunters amount
-                _config.HuntersAmount = huntersAmount.value;
-            }
         }
 
         public override void Draw()

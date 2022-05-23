@@ -12,7 +12,7 @@ namespace DuckGame.PropHunt
     }
     public class PHGameModeHandler : Thing
     {
-        private readonly PHModeConfig _config;
+        private readonly PHMode _config;
         private float _hidingTimer;
         private float _huntingTimer;
         private PHGameStatus _status = PHGameStatus.CREATED;
@@ -43,8 +43,8 @@ namespace DuckGame.PropHunt
             {
                 _status = value;
                 float remainingTime;
-                if (Status == PHGameStatus.HIDING) remainingTime = _config.HidingTime;
-                else if (Status == PHGameStatus.HUNTING) remainingTime = _config.HuntingTime;
+                if (Status == PHGameStatus.HIDING) remainingTime = _config.hidingTime.value;
+                else if (Status == PHGameStatus.HUNTING) remainingTime = _config.huntingTime.value;
                 else remainingTime = 0f;
 
                 Send.Message((NetMessage) new NMChangeStatus(Status, remainingTime));
@@ -90,8 +90,8 @@ namespace DuckGame.PropHunt
 
         public PHGameModeHandler(PHMode phMode) : base()
         {
-            _config = phMode.PHConfig;
-            _hidingTimer = _config.HidingTime;
+            _config = phMode;
+            _hidingTimer = _config.hidingTime.value;
         }
 
         public void SelectHunters(int amount)
@@ -116,9 +116,8 @@ namespace DuckGame.PropHunt
         }
         private void InitializeGM()
         {
-            DevConsole.Log("[PH] Configuration " + _config.ToString());
             DevConsole.Log("[PH] Initializing...");
-            SelectHunters(_config.HuntersAmount);
+            SelectHunters(_config.huntersAmount.value);
             InvokeStartHiding();
         }
 
@@ -143,7 +142,7 @@ namespace DuckGame.PropHunt
             GiveWeapons();
             MakeHuntersInvincibleAndFreeze();
             Status = PHGameStatus.HIDING;
-            _hidingTimer = _config.HidingTime;
+            _hidingTimer = _config.hidingTime.value;
             DevConsole.Log("[PH] Hiding...");
         }
 
@@ -151,7 +150,7 @@ namespace DuckGame.PropHunt
         {
             Status = PHGameStatus.HUNTING;
             MakeHuntersMortalAndUnFreeze();
-            _huntingTimer = _config.HidingTime;
+            _huntingTimer = _config.hidingTime.value;
             DevConsole.Log("[PH] Hunting...");
         }
 
@@ -258,7 +257,6 @@ namespace DuckGame.PropHunt
             base.Update();
             if(!DuckNetwork.allClientsReady) 
             {
-                DevConsole.Log("[PH] Not ready");
                 return;
             }
             switch (Status)
