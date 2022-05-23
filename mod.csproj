@@ -54,16 +54,12 @@
     <Compile Include="src\netmessages\NMChangeStatus.cs" />
     <Compile Include="src\PHCore.cs" />
     <Compile Include="src\PHDraw.cs" />
-    <Compile Include="src\PHGameMode.cs" />
     <Compile Include="src\PHGameModeHandler.cs" />
-    <Compile Include="src\PHHiderTool.cs" />
-    <Compile Include="src\PHHunterTool.cs" />
     <Compile Include="src\PHMode.cs" />
     <Compile Include="src\PHModeConfig.cs" />
     <Compile Include="src\spawns\PHHunterSpawn.cs" />
     <Compile Include="src\spawns\PHHiderSpawn.cs" />
     <Compile Include="src\spawns\PHSpawn.cs" />
-    <Compile Include="src\PHTool.cs" />
     <Compile Include="src\PropHunt.cs" />
     <Compile Include="src\tools\PHHiderTool.cs" />
     <Compile Include="src\tools\PHHunterTool.cs" />
