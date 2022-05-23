@@ -51,6 +51,14 @@ namespace DuckGame.PropHunt
             }
         }
 
+        public override Vec2 CameraSize
+        {
+            get
+            {
+                if (PropHunt.core.Data.Status == PHGameStatus.HIDING) return new Vec2(1f,1f);
+                else return base.CameraSize;
+            }
+        }
         public override void Update()
         {
             base.Update();

@@ -16,18 +16,23 @@ namespace DuckGame.PropHunt
 
         public override void Fire()
         {
+            // Only work when you have you hand empty
+            if (equippedDuck.holdObject != null) return;
+            // If you are already disguised, undisguise.
             if (_attachedProp != null) UnDisguise();
-            else if(_fireTimer <= 0f)
+            else if (_fireTimer <= 0f) // Cooldown timer...
             {
                 Holdable t = GetNearestProp();
                 if (t != null)
                 {
-                    _fireTimer = fireCooldown;
+                    _fireTimer = fireCooldown; // Starts the cooldown timer
+                    // Particles :D
                     if (Network.isActive)
                     {
                         Send.Message(new NMPop(duck.position));
                     }
                     NMPop.AmazingDisappearingParticles(duck.position);
+
                     DisguiseAsProp(t);
                 }
             }
@@ -61,7 +66,7 @@ namespace DuckGame.PropHunt
             {
                 _attachedProp.canPickUp = true;
                 _attachedProp.enablePhysics = true;
-                _attachedProp.ApplyForce(new Vec2(0,-1f));
+                _attachedProp.ApplyForce(new Vec2(0, -1f));
                 equippedDuck.Fondle(_attachedProp);
                 if (_attachedProp.equippedDuck != null) _attachedProp.equippedDuck.Disarm(this.equippedDuck);
             }
@@ -74,15 +79,8 @@ namespace DuckGame.PropHunt
             {
                 Vec2 circlePosition;
                 Equipment eq = d.GetEquipment(GetType());
-                if (eq != null)
-                {
-                    PHHiderTool tool = (PHHiderTool)eq;
-                    circlePosition = tool._attachedProp == null ? d.position : tool._attachedProp.position;
-                }
-                else
-                {
-                    circlePosition = d.position;
-                }
+                PHHiderTool tool = (PHHiderTool)eq;
+                circlePosition = tool._attachedProp == null ? d.position : tool._attachedProp.position;
                 Graphics.DrawCircle(circlePosition, 6f, Color.Blue);
             }
         }
@@ -106,7 +104,7 @@ namespace DuckGame.PropHunt
         public override void Thrown()
         {
             base.Thrown();
-            this.Presto();
+            Presto();
         }
 
     }

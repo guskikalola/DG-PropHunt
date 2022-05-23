@@ -18,8 +18,7 @@ namespace DuckGame.PropHunt
         {
             _sprite = new Sprite("chestPlatePickup");
             _sprite.CenterOrigin();
-            graphic = _sprite;
-
+            //graphic = _sprite;
 
             destructive = false;
             _fired = false;
@@ -96,6 +95,22 @@ namespace DuckGame.PropHunt
             }
         }
 
+        public virtual Vec2 CameraPosition
+        {
+            get
+            {
+                return equippedDuck.cameraPosition + equippedDuck.collisionOffset * 2 - new Vec2(45f, 7f);
+            }
+        }
+
+        public virtual Vec2 CameraSize
+        {
+            get
+            {
+                return new Vec2(100f, 100f * DuckGame.Graphics.aspect);
+            }
+        }
+
         public virtual void DrawTeamMates(List<Duck> teamMates)
         {
         }
@@ -104,9 +119,27 @@ namespace DuckGame.PropHunt
         {
             if (Level.current.camera != null && DuckNetwork.localProfile.duck.Equals(equippedDuck))
             {
-                Vec2 cameraPos = equippedDuck.cameraPosition + equippedDuck.collisionOffset*2 - new Vec2(45f, 0);
-                Level.current.camera.position = cameraPos;
-                Level.current.camera.size = new Vec2(100f, 100f * DuckGame.Graphics.aspect);
+                Level.current.camera.position = CameraPosition;
+                Level.current.camera.size = CameraSize;
+            }
+
+            // Hide players outside of the camera view
+            List<Team> teams = Teams.active;
+            foreach (Team team in teams)
+            {
+                List<Profile> profiles = team.activeProfiles;
+                foreach (Profile profile in profiles)
+                {
+                    Duck d = profile.duck;
+                    if(d != null)
+                    {
+                        if (d.ShouldDrawIcon() && PropHunt.core.Data.Status != PHGameStatus.ENDED)
+                        {
+                            d.localSpawnVisible = false;
+                        }
+                        else d.localSpawnVisible = true;
+                    }
+                }
             }
         }
 
