@@ -10,7 +10,7 @@
 [assembly: AssemblyDescription("Prop Hunt!")]
 
 // The mod's version
-[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyVersion("1.0.0.1")]
 
 
 namespace DuckGame.PropHunt

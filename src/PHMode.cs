@@ -22,6 +22,7 @@ namespace DuckGame.PropHunt
             _editorName = "Prop Hunt";
             _canFlip = false;
             _canHaveChance = false;
+            editorTooltip = "Add this to a level to make it a 'Prop Hunt Level'";
 
         }
 

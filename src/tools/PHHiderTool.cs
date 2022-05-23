@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace DuckGame.PropHunt
 {
-    [EditorGroup("PropHunt|tool")]
+    [EditorGroup("PropHunt|tools")]
     public class PHHiderTool : PHTool
     {
         public float _checkRadius = 7f;
