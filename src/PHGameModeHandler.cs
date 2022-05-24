@@ -148,6 +148,7 @@ namespace DuckGame.PropHunt
 
         private void OnStartHunting()
         {
+            Send.Message((NetMessage)new NMChangeZoom(_config.hidersZoom, _config.huntersZoom));
             Status = PHGameStatus.HUNTING;
             MakeHuntersMortalAndUnFreeze();
             _huntingTimer = _config.hidingTime.value;
@@ -224,6 +225,8 @@ namespace DuckGame.PropHunt
                 Level.Add(tool);
                 hunter.Equip(tool);
             }
+            PropHunt.core.Data.ChangeZoom(_config.hidersZoom, _config.huntersZoom);
+            Send.Message((NetMessage)new NMChangeZoom(_config.hidersZoom, _config.huntersZoom));
         }
 
         public void UpdateAliveDucks()

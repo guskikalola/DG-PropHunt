@@ -9,6 +9,8 @@ namespace DuckGame.PropHunt
     {
         private PHGameStatus _status;
         private float _remainingTime;
+        private float _hidersZoom;
+        private float _huntersZoom;
         public int winner = -1;
 
         public PHGameStatus Status
@@ -26,10 +28,32 @@ namespace DuckGame.PropHunt
             }
         }
 
-        internal void ChangeStatus(PHGameStatus status, float remainingTime)
+        public float HuntersZoom
+        {
+            get
+            {
+                return _huntersZoom;
+            }
+        }        
+        
+        public float HidersZoom
+        {
+            get
+            {
+                return _hidersZoom;
+            }
+        }
+
+        public void ChangeStatus(PHGameStatus status, float remainingTime)
         {
             _status = status;
             _remainingTime = remainingTime;
+        }
+
+        public void ChangeZoom(float hidersZoom, float huntersZoom)
+        {
+            _hidersZoom = hidersZoom;
+            _huntersZoom = huntersZoom;
         }
 
         public override string ToString()

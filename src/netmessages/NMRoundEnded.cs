@@ -19,7 +19,7 @@ namespace DuckGame.PropHunt
 
         public override void Activate()
         {
-            PropHunt.core.Data.winner = _winner;
+            if (PropHunt.core.Data != null) PropHunt.core.Data.winner = _winner;
         }
     }
 }

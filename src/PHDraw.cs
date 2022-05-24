@@ -9,7 +9,6 @@ namespace DuckGame.PropHunt
     public class PHDraw : IDrawable
     {
         public static PHDraw instance = null;
-        public Duck localDuck = null;
         public PHDraw()
         {
             instance = this;
@@ -46,7 +45,7 @@ namespace DuckGame.PropHunt
             DrawOrderChanged.ToString();
         }
 
-        private float CalculateScreenXCenter(string text)
+        public static float CalculateScreenXCenter(string text)
         {
             float tWidth = Graphics.GetStringWidth(text);
             float xCenter = MonoMain.screenWidth / 2;

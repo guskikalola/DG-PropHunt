@@ -28,8 +28,8 @@ namespace DuckGame.PropHunt
             }
         }
 
-        public PHData Data 
-        { 
+        public PHData Data
+        {
             get
             {
                 return _data;
@@ -83,6 +83,7 @@ namespace DuckGame.PropHunt
             _data = null;
             if (_gmHandler != null)
             {
+                Level.Remove(_gmHandler);
                 _gmHandler.active = false;
                 _gmHandler = null;
             }
@@ -107,13 +108,10 @@ namespace DuckGame.PropHunt
             if (Level.current != _prevLevel && Level.current.things.Count > 0)
             {
                 // Level exists ( Duck in level )
-                if (Level.current is XMLLevel || Level.current is DuckGameEditor || Level.current is TeamSelect2)
-                {
-                    _prevLevel = Level.current;
-                    InvokeLevelChanged(Level.current);
-                }
+                _prevLevel = Level.current;
+                InvokeLevelChanged(Level.current);
             }
-            if(Data != null)
+            if (Data != null)
             {
                 Data.Update();
             }

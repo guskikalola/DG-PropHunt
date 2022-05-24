@@ -23,7 +23,7 @@ namespace DuckGame.PropHunt
 
         public override void Activate()
         {
-            PropHunt.core.Data.ChangeStatus((PHGameStatus)_status, _remaningTime);
+            if(PropHunt.core.Data != null) PropHunt.core.Data.ChangeStatus((PHGameStatus)_status, _remaningTime);
         }
     }
 }

@@ -6,12 +6,22 @@ namespace DuckGame.PropHunt
     [EditorGroup("PropHunt|tools")]
     public class PHHunterTool : PHTool
     {
-        float checkRadius = 5f;
+        public float _checkRadius = 5f;
+
+        public override Color TeamColor
+        {
+            get
+            {
+                return Color.Red;
+            }
+        }
+
         public PHHunterTool(float xval, float yval) : base(xval, yval)
         {
             fireCooldown = 3f;
-            _sprite.color = Color.Red;
-            _teamMarker.color = Color.Red;
+            _sprite.color = TeamColor;
+            _teamMarker.color = TeamColor;
+            _health = 8;
         }
 
         public override void Fire()
@@ -28,19 +38,59 @@ namespace DuckGame.PropHunt
             if (_fireTimer <= 0f)
             {
                 _sprite.SetAnimation("active");
-                if (KillNearbyHiders()) _fireTimer = fireCooldown;
+                if (_target != null)
+                {
+                    _fireTimer = fireCooldown;
+                    if (KillNearbyHiders())
+                    {
+                        DevConsole.Log("[PH] Hider killed");
+                    }
+                    else
+                    {
+                        _health--;
+                        DevConsole.Log("[PH] Missed the hit, remaining HP: " + Health);
+                        if(_health <= 0)
+                        {
+                            equippedDuck.Kill(new DTPop());
+                        }
+                    }
+                }
             }
         }
 
         private bool KillNearbyHiders()
         {
-            Duck d = Level.CheckCircle<Duck>(equippedDuck.position.x, equippedDuck.position.y, checkRadius, equippedDuck);
-            if (d != null && d.GetEquipment(typeof(PHHiderTool)) != null)
+            if (_target != null && _target is Duck)
             {
-                d.Kill(new DTIncinerate(this));
+                ((Duck)_target).Kill(new DTIncinerate(this));
                 return true;
             }
             else return false;
+        }
+
+        public override void PickTarget()
+        {
+            Duck d = Level.CheckCircle<Duck>(equippedDuck.position.x, equippedDuck.position.y, _checkRadius, equippedDuck);
+            if (d != null && d.GetEquipment(typeof(PHHiderTool)) != null)
+            {
+                _target = d;
+            }
+            else
+            {
+                bool found = false;
+                IEnumerable<Holdable> props = Level.CheckCircleAll<Holdable>(this.position, _checkRadius);
+                foreach (Holdable p in props)
+                {
+                    bool validProp = p != this && p.canPickUp && !(p is IAmADuck) && (p.equippedDuck == null);
+                    if (validProp)
+                    {
+                        _target = p;
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) _target = null;
+            }
         }
 
         public override void DrawTeamMates(List<Duck> teamMates)
@@ -62,6 +112,7 @@ namespace DuckGame.PropHunt
         public override void Update()
         {
             base.Update();
+            if (PropHunt.core.Data != null) _zoom = PropHunt.core.Data.HuntersZoom;
         }
 
         public override void Thrown()
@@ -69,5 +120,6 @@ namespace DuckGame.PropHunt
             base.Thrown();
             this.Presto();
         }
+
     }
 }
