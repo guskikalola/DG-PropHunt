@@ -13,6 +13,8 @@ namespace DuckGame.PropHunt
         private float _huntersZoom;
         public int winner = -1;
 
+        private PHTool _tool;
+
         public PHGameStatus Status
         {
             get
@@ -41,6 +43,18 @@ namespace DuckGame.PropHunt
             get
             {
                 return _hidersZoom;
+            }
+        }
+
+        public PHTool Tool
+        {
+            get
+            {
+                return _tool;
+            }
+            set
+            {
+                _tool = value;
             }
         }
 

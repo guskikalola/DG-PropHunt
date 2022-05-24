@@ -6,12 +6,18 @@ namespace DuckGame.PropHunt
     [EditorGroup("PropHunt|tools")]
     public class PHHiderTool : PHTool
     {
+        public StateBinding _tauntIndexBinding = new StateBinding("_tauntIndex");
         public StateBinding _disguisedBinding = new StateBinding("_disguised");
         public StateBinding _textYBinding = new StateBinding("_textY");
         public float _checkRadius = 7f;
         private Holdable _attachedProp;
         public bool _disguised = false;
         public float _textY = 1f;
+        public int _tauntIndex = 0;
+        public string[] tauntPaths = { 
+                    "sounds/taunts/tiktok_snore.ogg",
+                    "sounds/taunts/lotofdamage.ogg"
+            };
 
         public override Color TeamColor
         {
@@ -50,6 +56,7 @@ namespace DuckGame.PropHunt
         {
             _sprite.color = TeamColor;
             _teamMarker.color = TeamColor;
+            _health = 1;
         }
 
         public override void Fire()
@@ -134,7 +141,7 @@ namespace DuckGame.PropHunt
 
             if (equippedDuck != null)
             {
-
+                equippedDuck.quackPitch = 0;
                 if (_attachedProp != null)
                 {
                     if (_disguised)
@@ -147,13 +154,24 @@ namespace DuckGame.PropHunt
                     }
                 }
 
-                if (PropHunt.core.Data != null) _zoom = PropHunt.core.Data.HidersZoom;
-
-                // Use the RSTICK or LSTICK to open the taunt menu
-                if (!equippedDuck.dead && (equippedDuck.inputProfile.Pressed("RSTICK") || equippedDuck.inputProfile.Pressed("LSTICK")))
+                if (PropHunt.core.Data != null)
                 {
-                    // Only open for local duck
-                    if (equippedDuck.profile.Equals(DuckNetwork.localProfile)) OpenTauntMenu();
+                    _zoom = PropHunt.core.Data.HidersZoom;
+                }
+                // Use the RSTICK or LSTICK to switch the taunt
+                // Only open for local duck
+                bool t1 = Network.isActive && equippedDuck.profile.Equals(DuckNetwork.localProfile);
+                bool t2 = !Network.isActive && equippedDuck.team.Equals(Teams.Player1);
+                if (!equippedDuck.dead && (t1||t2))
+                {
+                    if (equippedDuck.inputProfile.Pressed("LSTICK")) 
+                    {
+                        PreviousTaunt();
+                    }
+                    else if (equippedDuck.inputProfile.Pressed("RSTICK"))
+                    {
+                        NextTaunt();
+                    }
                 }
 
                 if (_attachedProp != null)
@@ -169,9 +187,25 @@ namespace DuckGame.PropHunt
             }
         }
 
-        private void OpenTauntMenu()
+        private void NextTaunt()
         {
-            DevConsole.Log("[PH] Opening taunt menu");
+            _tauntIndex = (_tauntIndex + 1) % (tauntPaths.Length); 
+            DevConsole.Log("[PH] Next taunt " + _tauntIndex);
+        }
+
+        private void PreviousTaunt()
+        {
+            _tauntIndex = (_tauntIndex - 1) % (tauntPaths.Length);
+            if (_tauntIndex < 0) _tauntIndex = tauntPaths.Length - 1;
+            DevConsole.Log("[PH] Previous taunt " + _tauntIndex);
+        }
+
+        public override void Special()
+        {
+            base.Special();
+            // Taunt
+            DevConsole.Log("Playing taunt: " + GetPath(tauntPaths[_tauntIndex]));
+            SFX.Play(GetPath(tauntPaths[_tauntIndex]));
         }
 
         public override void Thrown()

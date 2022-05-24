@@ -51,7 +51,7 @@ namespace DuckGame.PropHunt
                         DevConsole.Log("[PH] Missed the hit, remaining HP: " + Health);
                         if(_health <= 0)
                         {
-                            equippedDuck.Kill(new DTPop());
+                            equippedDuck.Kill(new DTIncinerate(this));
                         }
                     }
                 }
@@ -70,6 +70,11 @@ namespace DuckGame.PropHunt
 
         public override void PickTarget()
         {
+            if (equippedDuck == null)
+            {
+                _target = null;
+                return;
+            }
             Duck d = Level.CheckCircle<Duck>(equippedDuck.position.x, equippedDuck.position.y, _checkRadius, equippedDuck);
             if (d != null && d.GetEquipment(typeof(PHHiderTool)) != null)
             {
@@ -112,7 +117,10 @@ namespace DuckGame.PropHunt
         public override void Update()
         {
             base.Update();
-            if (PropHunt.core.Data != null) _zoom = PropHunt.core.Data.HuntersZoom;
+            if (PropHunt.core.Data != null)
+            {
+                _zoom = PropHunt.core.Data.HuntersZoom;
+            }
         }
 
         public override void Thrown()

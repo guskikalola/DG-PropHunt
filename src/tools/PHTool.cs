@@ -5,6 +5,7 @@ namespace DuckGame.PropHunt
 {
     public abstract class PHTool : Equipment
     {
+        public StateBinding _specialTimerBinding = new StateBinding("_specialTimer");
         public StateBinding _fireTimerBinding = new StateBinding("_fireTimer");
         public StateBinding _zoomBinding = new StateBinding("_zoom");
         protected SpriteMap _sprite;
@@ -17,6 +18,10 @@ namespace DuckGame.PropHunt
         protected float _fireTimer = 0f;
         public bool canFire = true;
         public float fireCooldown = 4f;
+
+        private bool _special;
+        public float specialCooldown = 6f;
+        protected float _specialTimer = 0f;
 
         protected float animationSpeed = 0.3f;
 
@@ -70,15 +75,15 @@ namespace DuckGame.PropHunt
             physicsMaterial = PhysicsMaterial.Metal;
 
             _fired = false;
+            _special = false;
         }
 
         public override void Update()
         {
             base.Update();
-            if (_fireTimer > 0f)
-            {
-                _fireTimer -= 0.01f;
-            }
+            if (_fireTimer > 0f) _fireTimer -= 0.01f;
+            if (_specialTimer > 0f) _specialTimer -= 0.01f;
+
             if (equippedDuck != null)
             {
                 InputProfile input = equippedDuck.inputProfile;
@@ -93,14 +98,35 @@ namespace DuckGame.PropHunt
                     }
                 }
                 if (!fire && _fired) _fired = false;
+
+                bool specialI = input.Down("QUACK");
+                if(specialI && !_special && _specialTimer <= 0f)
+                {
+                    _special = true;
+                    _specialTimer = specialCooldown;
+                    Special();
+                }
+
+                if (!specialI && _special) _special = false;
+
                 PickTarget();
                 ReduceVision();
+
+                bool t1 = Network.isActive && DuckNetwork.localProfile.duck.Equals(equippedDuck);
+                bool t2 = !Network.isActive && equippedDuck.team.Equals(Teams.Player1);
+
+                if ((t1 || t2) && PropHunt.core.Data != null && PropHunt.core.Data.Tool == null) PropHunt.core.Data.Tool = this;
             }
         }
 
         public virtual void Fire()
         {
             _sprite.SetAnimation("idle");
+        }
+
+        public virtual void Special()
+        {
+
         }
 
         public override void Thrown()
