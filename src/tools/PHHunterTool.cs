@@ -78,7 +78,7 @@ namespace DuckGame.PropHunt
             else
             {
                 bool found = false;
-                IEnumerable<Holdable> props = Level.CheckCircleAll<Holdable>(this.position, _checkRadius);
+                IEnumerable<Holdable> props = Level.CheckCircleAll<Holdable>(position, _checkRadius);
                 foreach (Holdable p in props)
                 {
                     bool validProp = p != this && p.canPickUp && !(p is IAmADuck) && (p.equippedDuck == null);

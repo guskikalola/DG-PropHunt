@@ -151,7 +151,7 @@ namespace DuckGame.PropHunt
             Send.Message((NetMessage)new NMChangeZoom(_config.hidersZoom, _config.huntersZoom));
             Status = PHGameStatus.HUNTING;
             MakeHuntersMortalAndUnFreeze();
-            _huntingTimer = _config.hidingTime.value;
+            _huntingTimer = _config.huntingTime.value;
             DevConsole.Log("[PH] Hunting...");
         }
 
