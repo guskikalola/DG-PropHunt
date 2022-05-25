@@ -7,13 +7,31 @@ namespace DuckGame.PropHunt
 {
     public class PHData
     {
-        private PHGameStatus _status;
-        private float _remainingTime;
-        private float _hidersZoom;
-        private float _huntersZoom;
+        private PHGameStatus _status = PHGameStatus.CREATED;
+        private float _remainingTime = 0;
+        private float _hidersZoom = 1;
+        private float _huntersZoom = 1;
+        private int _huntersAlive = 0;
+        private int _hidersAlive = 0;
         public int winner = -1;
 
         private PHTool _tool;
+
+        public int HidersAlive
+        {
+            get
+            {
+                return _hidersAlive;
+            }
+        }
+
+        public int HuntersAlive
+        {
+            get
+            {
+                return _huntersAlive;
+            }
+        }
 
         public PHGameStatus Status
         {
@@ -81,6 +99,12 @@ namespace DuckGame.PropHunt
             {
                 _remainingTime -= 0.01f;
             }
+        }
+
+        internal void UpdateAliveDucks(int hidersAlive, int huntersAlive)
+        {
+            _hidersAlive = hidersAlive;
+            _huntersAlive = huntersAlive;
         }
     }
 }

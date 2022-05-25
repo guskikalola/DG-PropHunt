@@ -14,10 +14,9 @@ namespace DuckGame.PropHunt
         public bool _disguised = false;
         public float _textY = 1f;
         public int _tauntIndex = 0;
-        public string[] tauntPaths = { 
-                    "sounds/taunts/tiktok_snore.ogg",
-                    "sounds/taunts/lotofdamage.ogg"
-            };
+        // This is a fix to a bug where, if the prop is solid, you could fly when going ragdoll
+        public float _nonSolidTimer = 0f;
+        public float nonSolidCooldown = 3f;
 
         public override Color TeamColor
         {
@@ -139,11 +138,18 @@ namespace DuckGame.PropHunt
         {
             base.Update();
 
+            if (_nonSolidTimer > 0f) _nonSolidTimer -= 0.01f;
+
             if (equippedDuck != null)
             {
-                equippedDuck.quackPitch = 0;
+
+                if (equippedDuck.ragdoll != null && _nonSolidTimer <= 0f) _nonSolidTimer = nonSolidCooldown;
+
+
                 if (_attachedProp != null)
                 {
+                    if (_nonSolidTimer > 0f) _attachedProp.solid = false;
+                    else _attachedProp.solid = true;
                     if (_disguised)
                     {
                         _textY = _attachedProp.position.y;
@@ -189,23 +195,26 @@ namespace DuckGame.PropHunt
 
         private void NextTaunt()
         {
-            _tauntIndex = (_tauntIndex + 1) % (tauntPaths.Length); 
-            DevConsole.Log("[PH] Next taunt " + _tauntIndex);
+            _tauntIndex = (_tauntIndex + 1) % (PropHunt.taunts.Count); 
+            DevConsole.Log("[PH] Next taunt : " + _tauntIndex);
         }
 
         private void PreviousTaunt()
         {
-            _tauntIndex = (_tauntIndex - 1) % (tauntPaths.Length);
-            if (_tauntIndex < 0) _tauntIndex = tauntPaths.Length - 1;
-            DevConsole.Log("[PH] Previous taunt " + _tauntIndex);
+            _tauntIndex = (_tauntIndex - 1) % (PropHunt.taunts.Count);
+            if (_tauntIndex < 0) _tauntIndex = PropHunt.taunts.Count - 1;
+            DevConsole.Log("[PH] Prev taunt : " + _tauntIndex);
+
         }
 
         public override void Special()
         {
             base.Special();
             // Taunt
-            DevConsole.Log("Playing taunt: " + GetPath(tauntPaths[_tauntIndex]));
-            SFX.Play(GetPath(tauntPaths[_tauntIndex]));
+            if (Network.isActive && !equippedDuck.profile.Equals(DuckNetwork.localProfile)) return;
+            PHTaunt taunt = PropHunt.taunts[_tauntIndex];
+            Send.Message(new NMTaunt(_tauntIndex, equippedDuck.profile.networkIndex));
+            taunt.Play();
         }
 
         public override void Thrown()

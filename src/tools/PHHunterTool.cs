@@ -70,7 +70,7 @@ namespace DuckGame.PropHunt
 
         public override void PickTarget()
         {
-            if (equippedDuck == null)
+            if (equippedDuck == null || equippedDuck.holdObject != null)
             {
                 _target = null;
                 return;
@@ -94,7 +94,7 @@ namespace DuckGame.PropHunt
                         break;
                     }
                 }
-                if (!found) _target = null;
+                if (!found || equippedDuck.holdObject != null) _target = null;
             }
         }
 

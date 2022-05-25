@@ -29,6 +29,22 @@ namespace DuckGame.PropHunt
 
         protected int _health;
 
+        public float SpecialTimer
+        {
+            get
+            {
+                return _specialTimer;
+            }
+        }
+
+        public float FireTimer
+        {
+            get
+            {
+                return _fireTimer;
+            }
+        }
+
         public int Health
         {
             get
@@ -132,6 +148,7 @@ namespace DuckGame.PropHunt
         public override void Thrown()
         {
             base.Thrown();
+            if (PropHunt.core.Data != null) PropHunt.core.Data.Tool = null;
             this.Presto();
         }
 
@@ -274,7 +291,6 @@ namespace DuckGame.PropHunt
                 DrawTarget();
             }
         }
-
 
     }
 }

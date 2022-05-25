@@ -19,6 +19,9 @@ namespace DuckGame.PropHunt
         private List<Duck> _hunters = new List<Duck>();
         private List<Duck> _hiders = new List<Duck>();
 
+        private int _preAliveHunters = 0;
+        private int _preAliveHiders = 0;
+
         public List<Duck> Hunters
         {
             get
@@ -231,6 +234,14 @@ namespace DuckGame.PropHunt
 
         public void UpdateAliveDucks()
         {
+            if(_preAliveHiders != HidersAlive || _preAliveHunters != HuntersAlive)
+            {
+                _preAliveHiders = HidersAlive;
+                _preAliveHunters = HuntersAlive;
+                PropHunt.core.Data.UpdateAliveDucks(HidersAlive, HuntersAlive);
+                Send.Message(new NMUpdateAlive(HuntersAlive, HidersAlive));
+            }
+
             if (HuntersAlive == 0 || HidersAlive == 0)
             {
                 InvokeRoundEnded();

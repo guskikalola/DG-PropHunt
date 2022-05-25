@@ -47,6 +47,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\netmessages\NMTaunt.cs" />
+    <Compile Include="src\netmessages\NMUpdateAlive.cs" />
+    <Compile Include="src\PHTaunt.cs" />
     <Compile Include="src\netmessages\NMChangeZoom.cs" />
     <Compile Include="src\netmessages\NMRoundEnded.cs" />
     <Compile Include="src\netmessages\NMMakeHuntersMortalAndUnFreeze.cs" />
