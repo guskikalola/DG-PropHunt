@@ -110,7 +110,7 @@ namespace DuckGame.PropHunt
         {
             get
             {
-                if (PropHunt.core.Data.Status == PHGameStatus.HIDING) return new Vec2(1f, 1f);
+                if (PropHunt.core.Data != null && PropHunt.core.Data.Status == PHGameStatus.HIDING) return new Vec2(1f, 1f);
                 else return base.CameraSize;
             }
         }

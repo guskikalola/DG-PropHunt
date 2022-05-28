@@ -248,7 +248,7 @@ namespace DuckGame.PropHunt
 
         public virtual void ReduceVision()
         {
-            if (equippedDuck == null) return;
+            if (equippedDuck == null || PropHunt.core.Data == null) return;
             if (Network.isActive && DuckNetwork.localProfile.duck == null) return; 
 
             bool t1 = Network.isActive && DuckNetwork.localProfile.duck.Equals(equippedDuck);
