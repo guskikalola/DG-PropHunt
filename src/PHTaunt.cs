@@ -49,6 +49,7 @@ namespace DuckGame.PropHunt
 
         public void Play()
         {
+            if (_path == null) return;
             SFX.Play(_path);
             DevConsole.Log(ToString());
         }

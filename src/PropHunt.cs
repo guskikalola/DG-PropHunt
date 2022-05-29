@@ -51,6 +51,7 @@ namespace DuckGame.PropHunt
 			Sprite lotsofdamage = new Sprite(GetPath("sprites/taunts/lotsofdamage"));
 			Sprite snorememe = new Sprite(GetPath("sprites/taunts/snorememe"));
 
+			AddTaunt(null);
 			AddTaunt(GetPath("sounds/taunts/lotofdamage.ogg"),lotsofdamage);
 			AddTaunt(GetPath("sounds/taunts/tiktok_snore.ogg"),snorememe);
 
